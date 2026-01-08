@@ -1,0 +1,11 @@
+streamlit
+pandas
+torch
+transformers
+huggingface_hub
+joblib
+emoji
+wordcloud
+matplotlib
+openpyxl
+scikit-learn
