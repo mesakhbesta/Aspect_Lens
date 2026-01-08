@@ -13,18 +13,11 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import streamlit.components.v1 as components
 
-# =========================
-# CONFIG
-# =========================
 MODEL_REPO = "mesakhbesta/IndoBERT_Aspek"
 DATASET_REPO = "mesakhbesta/IndoBERT_Aspek"
 BATCH_SIZE = 64
 
 st.set_page_config(page_title="AspectLens", layout="wide")
-
-# =========================
-# HEADER UI
-# =========================
 st.markdown(
     """
     <div style="padding:30px; border-radius:20px; background: linear-gradient(135deg, #1f4037, #99f2c8); color:white; margin-bottom:20px;">
@@ -36,9 +29,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# =========================
-# LOAD MODEL + RESOURCES
-# =========================
 @st.cache_resource
 def load_model():
     tokenizer = AutoTokenizer.from_pretrained(MODEL_REPO)
@@ -63,13 +53,9 @@ def load_resources():
 
     return lbl, slang_dict
 
-# load once
 tokenizer, model = load_model()
 lbl, slang_dict = load_resources()
 
-# =========================
-# PREPROCESS
-# =========================
 def preprocess_text(text):
     text = str(text).lower()
     text = emoji.demojize(text, delimiters=(" ", " "))
@@ -82,9 +68,6 @@ def preprocess_text(text):
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
-# =========================
-# BATCH PREDICT + PROGRESS BAR
-# =========================
 def batch_predict_with_progress(text_list, progress_bar, status_text, batch_size=BATCH_SIZE):
     results_clean = []
     results_label = []
@@ -122,17 +105,11 @@ def batch_predict_with_progress(text_list, progress_bar, status_text, batch_size
 
     return results_clean, results_label
 
-# =========================
-# SIDEBAR
-# =========================
 st.sidebar.markdown("## 📂 Upload Data")
 file = st.sidebar.file_uploader("Upload file (CSV / Excel / TXT)", type=["csv", "xlsx", "txt"])
 st.sidebar.markdown("---")
 run_btn = st.sidebar.button("🚀 Jalankan Analisis", use_container_width=True)
 
-# =========================
-# MAIN
-# =========================
 if file is not None:
     if file.name.endswith(".csv"):
         df = pd.read_csv(file)
@@ -162,9 +139,6 @@ if file is not None:
         status_text.text("✅ Analisis selesai!")
         progress_bar.empty()
 
-        # =========================
-        # SUMMARY
-        # =========================
         st.markdown("## 📊 Ringkasan Aspek")
         aspect_counts = Counter(labels)
 
@@ -180,9 +154,6 @@ if file is not None:
                 unsafe_allow_html=True
             )
 
-        # =========================
-        # PER ASPECT (ORDERED & STATE SAFE)
-        # =========================
         aspect_colors = {
             "Pujian": "#2ecc71",
             "Perbandingan / Saran / Ide": "#2980b9",
@@ -234,7 +205,6 @@ if file is not None:
 
             c1, c2 = st.columns([1, 1.3])
 
-            # WORDCLOUD (WHITE BG)
             with c1:
                 text_blob = " ".join(subset["clean_text"].tolist())
                 if text_blob.strip():
@@ -251,7 +221,6 @@ if file is not None:
                 else:
                     st.info("Tidak ada data untuk WordCloud")
 
-            # COMMENTS + PAGINATION (STATE SAFE)
             with c2:
                 total = len(subset)
                 per_page = 50
@@ -300,3 +269,4 @@ if file is not None:
 
 else:
     st.info("⬅️ Upload file di sidebar untuk memulai analisis")
+
